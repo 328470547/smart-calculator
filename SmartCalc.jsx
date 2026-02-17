@@ -683,6 +683,73 @@ const styles = `
     from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: translateY(0); }
   }
+
+  /* Footer */
+  .footer {
+    position: relative;
+    z-index: 5;
+    margin-top: 40px;
+    padding: 24px 20px 36px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+
+  .footer-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.85);
+    margin-bottom: 4px;
+  }
+
+  .footer-rights {
+    font-size: 11px;
+    color: rgba(255,255,255,0.3);
+    margin-bottom: 16px;
+    letter-spacing: 0.5px;
+  }
+
+  .footer-contacts {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .footer-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.04);
+    color: rgba(255,255,255,0.7);
+    font-size: 13px;
+    font-family: 'Heebo', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .footer-btn:hover {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    border-color: rgba(255,255,255,0.25);
+    transform: translateY(-1px);
+  }
+
+  .footer-btn.phone { border-color: #2EC4B644; }
+  .footer-btn.phone:hover { background: #2EC4B622; color: #2EC4B6; }
+
+  .footer-btn.email { border-color: #FF6B3544; }
+  .footer-btn.email:hover { background: #FF6B3522; color: #FF6B35; }
+
+  .footer-btn.whatsapp { border-color: #25D36644; }
+  .footer-btn.whatsapp:hover { background: #25D36622; color: #25D366; }
 `;
 
 export default function SmartCalc() {
@@ -894,6 +961,24 @@ export default function SmartCalc() {
           )}
 
         </div>
+
+        {/* Footer */}
+        <div className="footer">
+          <div className="footer-name">✦ יצחק גבאי</div>
+          <div className="footer-rights">© כל הזכויות שמורות {new Date().getFullYear()}</div>
+          <div className="footer-contacts">
+            <a href="tel:0503477369" className="footer-btn phone">
+              📞 050-347-7369
+            </a>
+            <a href="mailto:g0503477369@gmail.com" className="footer-btn email">
+              ✉️ שלח מייל
+            </a>
+            <a href="https://wa.me/972503477369" target="_blank" rel="noreferrer" className="footer-btn whatsapp">
+              💬 וואטסאפ
+            </a>
+          </div>
+        </div>
+
       </div>
     </>
   );
