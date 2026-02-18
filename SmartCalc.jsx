@@ -201,11 +201,11 @@ const categories = [
         label: "עלות נסיעה בבנזין",
         fields: [
           { id: "km", label: 'מרחק (ק"מ)', type: "number" },
-          { id: "consumption", label: 'צריכת דלק (ל/100ק"מ)', type: "number" },
+          { id: "efficiency", label: 'יעילות הרכב (ק"מ לליטר)', type: "number" },
           { id: "price", label: "מחיר בנזין (₪ לליטר)", type: "number" },
         ],
         calculate: (f) => {
-          const liters = (f.km * f.consumption) / 100;
+          const liters = f.km / f.efficiency;
           const cost = liters * f.price;
           return "ליטרים שתצרוך: " + liters.toFixed(2) + "\nעלות הנסיעה: ₪" + cost.toFixed(2);
         },
@@ -229,12 +229,12 @@ const categories = [
         label: "הוצאה חודשית על דלק",
         fields: [
           { id: "daily_km", label: 'ק"מ ביום בממוצע', type: "number" },
-          { id: "consumption", label: 'צריכת דלק (ל/100ק"מ)', type: "number" },
+          { id: "efficiency", label: 'יעילות הרכב (ק"מ לליטר)', type: "number" },
           { id: "price", label: "מחיר בנזין (₪ לליטר)", type: "number" },
         ],
         calculate: (f) => {
           const monthly_km = f.daily_km * 30;
-          const liters = (monthly_km * f.consumption) / 100;
+          const liters = monthly_km / f.efficiency;
           const cost = liters * f.price;
           return 'ק"מ בחודש: ' + monthly_km + "\nליטרים: " + liters.toFixed(1) + "\nעלות חודשית: ₪" + cost.toFixed(0);
         },
@@ -346,10 +346,14 @@ const styles = `
   body {
     font-family: 'Heebo', sans-serif;
     direction: rtl;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    overscroll-behavior: none;
   }
 
   .app {
     min-height: 100vh;
+    min-height: 100dvh;
     background: #0d1117;
     color: #e6edf3;
     font-family: 'Heebo', sans-serif;
@@ -391,15 +395,16 @@ const styles = `
   }
 
   .header {
-    position: relative;
     z-index: 10;
-    padding: 20px 24px;
+    padding: 16px 20px;
+    padding-top: calc(16px + env(safe-area-inset-top));
     border-bottom: 1px solid rgba(255,255,255,0.06);
+    -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
-    background: rgba(13,17,23,0.8);
+    background: rgba(13,17,23,0.9);
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
     position: sticky;
     top: 0;
   }
@@ -409,7 +414,7 @@ const styles = `
     border: 1px solid rgba(255,255,255,0.1);
     color: #e6edf3;
     border-radius: 10px;
-    padding: 8px 16px;
+    padding: 10px 16px;
     cursor: pointer;
     font-size: 14px;
     font-family: 'Heebo', sans-serif;
@@ -418,6 +423,11 @@ const styles = `
     display: flex;
     align-items: center;
     gap: 6px;
+    min-height: 44px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
 
   .back-btn:hover {
@@ -425,23 +435,32 @@ const styles = `
     border-color: rgba(255,255,255,0.2);
   }
 
+  .back-btn:active {
+    transform: scale(0.96);
+  }
+
   .header-title {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 800;
     letter-spacing: -0.5px;
+    white-space: nowrap;
   }
 
   .header-sub {
-    font-size: 12px;
+    font-size: 11px;
     color: rgba(255,255,255,0.35);
     margin-top: 2px;
     font-weight: 400;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .content {
     position: relative;
     z-index: 5;
-    padding: 28px 20px;
+    padding: 20px 16px;
+    padding-bottom: calc(28px + env(safe-area-inset-bottom));
     max-width: 480px;
     margin: 0 auto;
   }
@@ -450,51 +469,45 @@ const styles = `
   .category-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    gap: 10px;
   }
 
   .category-card {
     background: rgba(255,255,255,0.03);
     border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 20px;
-    padding: 24px 16px;
+    border-radius: 18px;
+    padding: 20px 12px;
     cursor: pointer;
     color: #e6edf3;
     text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    gap: 8px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
+    min-height: 110px;
+    justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
 
-  .category-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    transition: opacity 0.25s;
-    border-radius: 20px;
+  .category-card:active {
+    transform: scale(0.95);
   }
 
   .category-card:hover {
     transform: translateY(-3px);
-    border-color: rgba(255,255,255,0.15);
-  }
-
-  .category-card:hover::before {
-    opacity: 1;
   }
 
   .category-icon {
-    font-size: 30px;
+    font-size: 28px;
     line-height: 1;
   }
 
   .category-label {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
   }
 
@@ -512,9 +525,9 @@ const styles = `
   }
 
   .tool-list-header {
-    font-size: 12px;
+    font-size: 11px;
     color: rgba(255,255,255,0.3);
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     font-weight: 500;
     letter-spacing: 1px;
     text-transform: uppercase;
@@ -536,17 +549,25 @@ const styles = `
     align-items: center;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     width: 100%;
+    min-height: 54px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
 
   .tool-card:hover {
     background: rgba(255,255,255,0.08);
-    transform: translateX(-3px);
+  }
+
+  .tool-card:active {
+    transform: scale(0.98);
+    background: rgba(255,255,255,0.08);
   }
 
   .tool-arrow {
     opacity: 0.4;
     font-size: 18px;
     transition: all 0.2s;
+    flex-shrink: 0;
   }
 
   .tool-card:hover .tool-arrow {
@@ -559,10 +580,10 @@ const styles = `
     background: rgba(255,255,255,0.03);
     border: 1px solid rgba(255,255,255,0.08);
     border-radius: 20px;
-    padding: 24px;
+    padding: 20px;
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 16px;
   }
 
   .field-group {
@@ -582,7 +603,7 @@ const styles = `
     background: rgba(255,255,255,0.06);
     border: 1px solid rgba(255,255,255,0.1);
     border-radius: 12px;
-    padding: 13px 16px;
+    padding: 14px 16px;
     color: #e6edf3;
     font-size: 16px;
     font-family: 'Heebo', sans-serif;
@@ -590,6 +611,9 @@ const styles = `
     direction: ltr;
     text-align: right;
     transition: all 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
+    min-height: 50px;
   }
 
   .field-input:focus {
@@ -601,10 +625,19 @@ const styles = `
     color: rgba(255,255,255,0.2);
   }
 
+  .field-input::-webkit-outer-spin-button,
+  .field-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .field-input[type=number] {
+    -moz-appearance: textfield;
+  }
+
   .calc-btn {
     border: none;
     border-radius: 14px;
-    padding: 15px;
+    padding: 16px;
     color: #fff;
     font-size: 16px;
     font-weight: 700;
@@ -612,15 +645,17 @@ const styles = `
     cursor: pointer;
     transition: all 0.2s;
     letter-spacing: 0.3px;
+    min-height: 54px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
 
   .calc-btn:hover {
-    transform: translateY(-1px);
     filter: brightness(1.1);
   }
 
   .calc-btn:active {
-    transform: translateY(0);
+    transform: scale(0.98);
   }
 
   /* Error */
@@ -638,7 +673,7 @@ const styles = `
   .result-card {
     margin-top: 14px;
     border-radius: 20px;
-    padding: 22px;
+    padding: 20px;
     animation: slide-up 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
@@ -652,7 +687,7 @@ const styles = `
     font-weight: 700;
     letter-spacing: 2px;
     text-transform: uppercase;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
     opacity: 0.8;
   }
 
@@ -688,8 +723,9 @@ const styles = `
   .footer {
     position: relative;
     z-index: 5;
-    margin-top: 40px;
-    padding: 24px 20px 36px;
+    margin-top: 32px;
+    padding: 20px 16px;
+    padding-bottom: calc(32px + env(safe-area-inset-bottom));
     border-top: 1px solid rgba(255,255,255,0.06);
     max-width: 480px;
     margin-left: auto;
@@ -707,14 +743,14 @@ const styles = `
   .footer-rights {
     font-size: 11px;
     color: rgba(255,255,255,0.3);
-    margin-bottom: 16px;
+    margin-bottom: 14px;
     letter-spacing: 0.5px;
   }
 
   .footer-contacts {
     display: flex;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
     flex-wrap: wrap;
   }
 
@@ -722,7 +758,7 @@ const styles = `
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 8px 16px;
+    padding: 10px 14px;
     border-radius: 20px;
     border: 1px solid rgba(255,255,255,0.1);
     background: rgba(255,255,255,0.04);
@@ -733,13 +769,19 @@ const styles = `
     cursor: pointer;
     text-decoration: none;
     transition: all 0.2s;
+    min-height: 44px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
 
   .footer-btn:hover {
     background: rgba(255,255,255,0.1);
     color: #fff;
     border-color: rgba(255,255,255,0.25);
-    transform: translateY(-1px);
+  }
+
+  .footer-btn:active {
+    transform: scale(0.97);
   }
 
   .footer-btn.phone { border-color: #2EC4B644; }
@@ -750,6 +792,22 @@ const styles = `
 
   .footer-btn.whatsapp { border-color: #25D36644; }
   .footer-btn.whatsapp:hover { background: #25D36622; color: #25D366; }
+
+  @media (max-width: 360px) {
+    .category-label { font-size: 13px; }
+    .category-icon { font-size: 24px; }
+    .header-title { font-size: 16px; }
+    .result-line-primary { font-size: 18px; }
+    .footer-btn { font-size: 12px; padding: 8px 10px; }
+  }
+
+  @media (min-width: 480px) {
+    .content { padding: 28px 20px; }
+    .header { padding: 20px 24px; padding-top: calc(20px + env(safe-area-inset-top)); }
+    .category-card { padding: 24px 16px; }
+    .category-icon { font-size: 30px; }
+    .category-label { font-size: 15px; }
+  }
 `;
 
 export default function SmartCalc() {
@@ -826,7 +884,7 @@ export default function SmartCalc() {
               ← חזרה
             </button>
           )}
-          <div>
+          <div style={{ overflow: "hidden" }}>
             <div className="header-title">🧮 מחשבון חכם</div>
             <div className="header-sub">{getHeaderSub()}</div>
           </div>
@@ -842,10 +900,7 @@ export default function SmartCalc() {
                   key={c.id}
                   className="category-card"
                   onClick={() => selectCategory(c.id)}
-                  style={{
-                    "--cat-color": c.color,
-                    borderColor: c.color + "30",
-                  }}
+                  style={{ borderColor: c.color + "30" }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.background = c.color + "18";
                     e.currentTarget.style.borderColor = c.color + "60";
@@ -901,6 +956,7 @@ export default function SmartCalc() {
                     <input
                       className="field-input"
                       type="number"
+                      inputMode="decimal"
                       value={fields[f.id] || ""}
                       onChange={(e) => {
                         setFields({ ...fields, [f.id]: e.target.value });
@@ -909,9 +965,6 @@ export default function SmartCalc() {
                       }}
                       onKeyDown={(e) => e.key === "Enter" && handleCalc()}
                       placeholder="הכנס מספר..."
-                      style={{
-                        "--focus-color": cat.color,
-                      }}
                       onFocus={(e) => {
                         e.target.style.borderColor = cat.color + "80";
                         e.target.style.boxShadow = `0 0 0 3px ${cat.color}15`;
